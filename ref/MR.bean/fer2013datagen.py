@@ -4,6 +4,8 @@ import numpy as np
 import random
 import sys
 
+from image_augmentor import augmentor
+
 # fer2013 dataset:
 # Training       28709
 # PrivateTest     3589
@@ -32,12 +34,14 @@ def emotion_count(y_train, classes, verbose=True):
         emo_classcount[_class] = (new_num, class_count)
     return y_train.values, emo_classcount
     
+"""
 def data_augmentation_by_flip(X_train,y_train):
     fliped_X = X_train[:,:,:,::-1]
     fliped_y = y_train
     X_train = np.concatenate((X_train, fliped_X))
     y_train = np.concatenate((y_train, fliped_y))
     return X_train, y_train
+"""
 
 def load_data(sample_split=0.3, usage='Training', to_cat=True, verbose=True, augmentation=False,
               classes=['Angry','Happy'], filepath='../../data/FER2013/fer2013.csv'):
@@ -46,10 +50,12 @@ def load_data(sample_split=0.3, usage='Training', to_cat=True, verbose=True, aug
     # print df.Usage.value_counts()
     if usage == 'Training':
         df = df[df.Usage == 'Training']
+    if usage == 'Validation':
+        df = df[df.Usage == 'PrivateTest']
     elif usage == 'Test':
-        df1 = df[df.Usage == 'PublicTest'] 
-        df2 = df[df.Usage == 'PrivateTest']
-        df = pd.concat([df1, df2], ignore_index=True)
+        df = df[df.Usage == 'PublicTest'] 
+        #df2 = df[df.Usage == 'PrivateTest']
+        #df = pd.concat([df1, df2], ignore_index=True)
     frames = []
     classes.append('Disgust')
     for _class in classes:
@@ -68,7 +74,7 @@ def load_data(sample_split=0.3, usage='Training', to_cat=True, verbose=True, aug
         y_train = to_categorical(y_train)
     
     if augmentation:
-        X_train, y_train = data_augmentation_by_flip(X_train,y_train)
+        X_train, y_train = augmentor(X_train,y_train)
     return X_train, y_train, new_dict
 
 def save_data(X_train, y_train, usage='Training', fname='', folder='../../data/FER2013/'):
@@ -87,12 +93,24 @@ if __name__ == '__main__':
                                            augmentation=True)
     print('Saving...')
     save_data(X_train, y_train, usage="Training", fname='6_5pct')
+    X_valid, y_valid, emo_dict = load_data(sample_split=1.0,
+                                           classes=emo,
+                                           usage='Validation',
+                                           verbose=True,
+                                           augmentation=False)
+    print('Saving...')
+    save_data(X_valid, y_valid, usage="Validation", fname='6_5pct')
     X_test, y_test, emo_dict = load_data(sample_split=1.0,
                                            classes=emo,
                                            usage='Test',
                                            verbose=True,
                                            augmentation=False)
     save_data(X_test, y_test, usage="Test", fname='6_5pct')
-    print(X_train.shape)
-    print(y_train.shape)
+    print('Saving...')
+    print("X_train.shape :", X_train.shape)
+    print("y_train.shape :", y_train.shape)
+    print("X_valid.shape :", X_valid.shape)
+    print("y_valid.shape :", y_valid.shape)
+    print("X_test.shape :", X_test.shape)
+    print("y_test.shape :", y_test.shape)
     print('Done!')

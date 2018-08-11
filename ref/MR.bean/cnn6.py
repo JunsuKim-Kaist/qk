@@ -29,8 +29,8 @@ def logging(model, starttime, batch_size, nb_epoch, conv_arch,dense, dropout,
     save_result(starttime, batch_size, nb_epoch, conv_arch, dense, dropout,
                     X_shape, y_shape, train_acc, val_acc, dirpath)
 
-def cnn_architecture(X_train, y_train, conv_arch=[(32,3),(64,3),(128,3)],
-                    dense=[64,2], dropout=0.5, batch_size=128, nb_epoch=100, validation_split=0.2, patience=5, dirpath='../../data/FER2013/results/'):
+def cnn_architecture(X_train, y_train, X_valid, y_valid, conv_arch=[(32,3),(64,3),(128,3)],
+                    dense=[64,2], dropout=0.5, batch_size=128, nb_epoch=100, patience=5, dirpath='../../data/FER2013/results/'):
     starttime = time.time()
     X_train = X_train.astype('float32')
     X_shape = X_train.shape
@@ -90,7 +90,7 @@ def cnn_architecture(X_train, y_train, conv_arch=[(32,3),(64,3),(128,3)],
 
     '''without data augmentation'''
     hist = model.fit(X_train, y_train, epochs=nb_epoch, batch_size=batch_size,
-              validation_split=validation_split, callbacks=callbacks, shuffle=True, verbose=1)
+              validation_data=(X_valid,y_valid), callbacks=callbacks, shuffle=True, verbose=1)
 
     # model result:
     train_val_accuracy = hist.history
@@ -119,19 +119,25 @@ def predict(model,X_test,y_test):
     
 if __name__ == '__main__':
     # import dataset:
-    X_train_fname = '../../data/FER2013/X_train6_5pct.npy'
-    y_train_fname = '../../data/FER2013/y_train6_5pct.npy'
+    X_train_fname = '../../data/FER2013/X_Training6_5pct.npy'
+    y_train_fname = '../../data/FER2013/y_Training6_5pct.npy'
     print('Loading data...')
     X_train = np.load(X_train_fname)
     y_train = np.load(y_train_fname)
     
-    X_test_fname = '../../data/FER2013/X_test6_5pct.npy'
-    y_test_fname = '../../data/FER2013/y_test6_5pct.npy'
+    X_valid_fname = '../../data/FER2013/X_Validation6_5pct.npy'
+    y_valid_fname = '../../data/FER2013/y_Validation6_5pct.npy'
+    print('Loading data...')
+    X_valid = np.load(X_valid_fname)
+    y_valid = np.load(y_valid_fname)
+    
+    X_test_fname = '../../data/FER2013/X_Test6_5pct.npy'
+    y_test_fname = '../../data/FER2013/y_Test6_5pct.npy'
     X_test = np.load(X_test_fname)
     y_test = np.load(y_test_fname)
     
     
-    #model = cnn_architecture(X_train, y_train, conv_arch=[(32,3),(64,3),(128,3)], dense=[512,2], dropout=0.4, batch_size=128, nb_epoch=100, dirpath = '../../data/FER2013/results/')
-    model = cnn_architecture(X_train, y_train, conv_arch=[(32,3),(64,3),(128,3)], dense=[64,2], batch_size=256, nb_epoch=1, dirpath = '../../data/FER2013/results/')
+    model = cnn_architecture(X_train, y_train, X_valid, y_valid, conv_arch=[(32,3),(64,3),(128,3)], dense=[512,2], dropout=0.4, batch_size=128, nb_epoch=100, dirpath = '../../data/FER2013/results/')
+    #model = cnn_architecture(X_train, y_train, conv_arch=[(32,3),(64,3),(128,3)], dense=[64,2], batch_size=256, nb_epoch=1, dirpath = '../../data/FER2013/results/')
     test_accuracy = predict(model,X_test,y_test)
 
