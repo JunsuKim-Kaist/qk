@@ -9,3 +9,5 @@ MR.bean
 $ cd ref/MR.bean
 $ python3 fer2013datagen.py
 $ python3 cnn6.py
+
+junsu_server_test
