@@ -55,11 +55,11 @@ transform_test = transforms.Compose([
 ])
 
 trainset = FER2013(split = 'Training', transform=transform_train)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.bs, shuffle=True, num_workers=1)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.bs, shuffle=True, num_workers=0)
 PublicTestset = FER2013(split = 'PublicTest', transform=transform_test)
-PublicTestloader = torch.utils.data.DataLoader(PublicTestset, batch_size=opt.bs, shuffle=False, num_workers=1)
+PublicTestloader = torch.utils.data.DataLoader(PublicTestset, batch_size=opt.bs, shuffle=False, num_workers=0)
 PrivateTestset = FER2013(split = 'PrivateTest', transform=transform_test)
-PrivateTestloader = torch.utils.data.DataLoader(PrivateTestset, batch_size=opt.bs, shuffle=False, num_workers=1)
+PrivateTestloader = torch.utils.data.DataLoader(PrivateTestset, batch_size=opt.bs, shuffle=False, num_workers=0)
 
 # Model
 if opt.model == 'VGG19':
