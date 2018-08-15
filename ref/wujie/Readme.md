@@ -26,7 +26,7 @@ The training set consists of 28,709 examples. The public test set consists of 3,
 - python preprocess_fer2013.py
 
 ### Train and Eval model ###
-- python mainpro_FER.py --model VGG19 --bs 128 --lr 0.01
+- python3 mainpro_FER.py --model VGG19 --bs 128 --lr 0.01
 
 ### plot confusion matrix ###
 - python plot_fer2013_confusion_matrix.py --model VGG19 --split PrivateTest

@@ -26,6 +26,7 @@ parser.add_argument('--resume', '-r', action='store_true', help='resume from che
 opt = parser.parse_args()
 
 use_cuda = torch.cuda.is_available()
+print("Cuda is available :", use_cuda)
 best_PublicTest_acc = 0  # best PublicTest accuracy
 best_PublicTest_acc_epoch = 0
 best_PrivateTest_acc = 0  # best PrivateTest accuracy
@@ -73,7 +74,12 @@ if opt.resume:
     assert os.path.isdir(path), 'Error: no checkpoint directory found!'
     checkpoint = torch.load(os.path.join(path,'PrivateTest_model.t7'))
 
-    net.load_state_dict(checkpoint['net'])
+    #print("net is : ",net)
+    #print("checkpoint is : ", checkpoint)
+    if not use_cuda:
+        net.load_state_dict(checkpoint['net'].state_dict())
+    else:
+        net.load_state_dict(checkpoint['net'])
     best_PublicTest_acc = checkpoint['best_PublicTest_acc']
     best_PrivateTest_acc = checkpoint['best_PrivateTest_acc']
     best_PrivateTest_acc_epoch = checkpoint['best_PublicTest_acc_epoch']
