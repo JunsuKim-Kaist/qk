@@ -10,4 +10,8 @@ $ cd ref/MR.bean
 $ python3 fer2013datagen.py
 $ python3 cnn6.py
 
-junsu_server_test
+brihati
+
+Wujie
+$ python3 mainpro_FER.py --model VGG19 --bs 128 --lr 0.01
+
