@@ -26,7 +26,7 @@ The training set consists of 28,709 examples. The public test set consists of 3,
 - python preprocess_fer2013.py
 
 ### Train and Eval model ###
-- python3 mainpro_FER.py --model VGG19 --bs 128 --lr 0.01
+- python3 mainpro_FER.py --model VGG19 --bs 64 --lr 0.01
 
 ### plot confusion matrix ###
 - python plot_fer2013_confusion_matrix.py --model VGG19 --split PrivateTest
@@ -42,7 +42,7 @@ We extracted the last three frames from each sequence in the CK+ dataset, which
 contains a total of 981 facial expressions. we use 10-fold Cross validation in the experiment.
 
 ### Train and Eval model for a fold ###
-- python mainpro_CK+.py --model VGG19 --bs 128 --lr 0.01 --fold 1
+- python mainpro_CK+.py --model VGG19 --bs 64 --lr 0.01 --fold 1
 
 ### Train and Eval model for all 10 fold ###
 - python k_fold_train.py
