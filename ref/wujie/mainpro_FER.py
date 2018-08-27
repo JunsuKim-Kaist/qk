@@ -145,7 +145,9 @@ def PublicTest(epoch):
         inputs = inputs.view(-1, c, h, w)
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
-        inputs, targets = Variable(inputs, volatile=True), Variable(targets)
+        targets = Variable(targets)
+        with torch.no_grad():
+            inputs = Variable(inputs)
         outputs = net(inputs)
         outputs_avg = outputs.view(bs, ncrops, -1).mean(1)  # avg over crops
         loss = criterion(outputs_avg, targets)
