@@ -15,7 +15,7 @@ import argparse
 import utils
 from qia import QIA
 from torch.autograd import Variable
-from models import VGG
+from models import *
 
 parser = argparse.ArgumentParser(description='PyTorch QIA CNN Training')
 parser.add_argument('--model', type=str, default='VGG19', help='CNN architecture')

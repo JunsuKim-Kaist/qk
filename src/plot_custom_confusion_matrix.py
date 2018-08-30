@@ -12,25 +12,26 @@ import torch.nn.functional as F
 
 import os
 import argparse
-from fer import FER2013
+from custom import CUSTOM
 
 from torch.autograd import Variable
 import torchvision
 import transforms as transforms
 from sklearn.metrics import confusion_matrix
 from models import *
+from openpyxl import Workbook
 
 
 parser = argparse.ArgumentParser(description='PyTorch Fer2013 CNN Training')
 parser.add_argument('--model', type=str, default='VGG19', help='CNN architecture')
-parser.add_argument('--dataset', type=str, default='custom', help='CNN architecture')
+parser.add_argument('--dataset', type=str, default='QIA', help='CNN architecture')
 parser.add_argument('--split', type=str, default='PrivateTest', help='split')
 opt = parser.parse_args()
 
 cut_size = 44
 
 transform_test = transforms.Compose([
-    transforms.TenCrop(cut_size),
+    transforms.FiveCrop(cut_size),
     transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
 ])
 
@@ -79,27 +80,39 @@ elif opt.model  == 'Resnet18':
     net = ResNet18()
 
 path = os.path.join(opt.dataset + '_' + opt.model)
-checkpoint = torch.load(os.path.join(path, opt.split + '_model.t7'))
+checkpoint = torch.load(os.path.join(path, 'PrivateTest' + '_model.t7'))
 
 net.load_state_dict(checkpoint['net'])
 net.cuda()
 net.eval()
-Testset = FER2013(split = opt.split, transform=transform_test)
-Testloader = torch.utils.data.DataLoader(Testset, batch_size=128, shuffle=False, num_workers=1)
+Testset = CUSTOM(transform=transform_test)
+Testloader = torch.utils.data.DataLoader(Testset, batch_size=1, shuffle=False, num_workers=0)
 correct = 0
 total = 0
 all_target = []
-for batch_idx, (inputs, targets) in enumerate(Testloader):
+
+wb = Workbook()
+ws1 = wb.active
+ws1.title = "Sheet1"
+
+for batch_idx, (title, inputs, targets) in enumerate(Testloader):
+
+    #print(batch_idx)
+
 
     bs, ncrops, c, h, w = np.shape(inputs)
     inputs = inputs.view(-1, c, h, w)
     inputs, targets = inputs.cuda(), targets.cuda()
-    inputs, targets = Variable(inputs, volatile=True), Variable(targets)
+    targets = Variable(targets)
+    with torch.no_grad():
+        inputs = Variable(inputs)
     outputs = net(inputs)
 
     outputs_avg = outputs.view(bs, ncrops, -1).mean(1)  # avg over crops
     _, predicted = torch.max(outputs_avg.data, 1)
 
+    ws1["A"+str(batch_idx+1)] = title[0]
+    ws1["B"+str(batch_idx+1)] = class_names[predicted]
     total += targets.size(0)
     correct += predicted.eq(targets.data).cpu().sum()
     if batch_idx == 0:
@@ -109,16 +122,18 @@ for batch_idx, (inputs, targets) in enumerate(Testloader):
         all_predicted = torch.cat((all_predicted, predicted),0)
         all_targets = torch.cat((all_targets, targets),0)
 
+wb.save("./test.xlsx")
 acc = 100. * correct / total
 print("accuracy: %0.3f" % acc)
 
 # Compute confusion matrix
+
 matrix = confusion_matrix(all_targets.data.cpu().numpy(), all_predicted.cpu().numpy())
 np.set_printoptions(precision=2)
 
 # Plot normalized confusion matrix
 plt.figure(figsize=(10, 8))
 plot_confusion_matrix(matrix, classes=class_names, normalize=True,
-                      title= opt.split+' Confusion Matrix (Accuracy: %0.3f%%)' %acc)
-plt.savefig(os.path.join(path, opt.split + '_cm.png'))
+                      title= "CustomTest"+' Confusion Matrix (Accuracy: %0.3f%%)' %acc)
+plt.savefig(os.path.join(path, "CustomTest" + '_cm.png'))
 plt.close()

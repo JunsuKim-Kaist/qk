@@ -5,6 +5,7 @@ from PIL import Image
 import numpy as np
 import h5py
 import torch.utils.data as data
+import openpyxl
 
 class CUSTOM(data.Dataset):
     """`FER2013 Dataset.
@@ -16,16 +17,33 @@ class CUSTOM(data.Dataset):
             and returns a transformed version. E.g, ``transforms.RandomCrop``
     """
 
+
     def __init__(self, split='Test', transform=None):
         self.transform = transform
         self.split = split  # training set or test set
-        self.data = h5py.File('./data/custom.h5', 'r', driver='core')
+        self.data = h5py.File('/mnt/home/qualcomm/customdata/customdata.h5', 'r', driver='core')
         # now load the picked numpy arrays
+        #for key in self.data.keys():
+        #    print(key)
+        #    print(type(self.data[key][0]))
 
-        self.data = self.data['pixel']
-        self.labels = self.data['label']
+        Emofile = '/mnt/home/qualcomm/customdata/customdata.xlsx'
+        wb = openpyxl.load_workbook(Emofile)
+        ws = wb.get_sheet_by_name('Sheet1')
+        #print(self.data['customTest_titleIndex'][0])
+        self.title = []
+        for index in range(140):
+            rowIndex = self.data['customTest_titleIndex'][index]
+            #print(rowIndex)
+            #print(ws.cell(row= rowIndex, column=1).value)
+            self.title.append(ws.cell(row= rowIndex, column=1).value)
+        self.labels = self.data['customTest_label']
+        self.data = self.data['customTest_pixel']
+
         self.data = np.asarray(self.data)
         self.data = self.data.reshape((140, 10, 48, 48, 3))
+
+        #print(self.title)
 
     def __getitem__(self, index):
         """
@@ -36,6 +54,8 @@ class CUSTOM(data.Dataset):
             tuple: (image, target) where target is index of the target class.
         """
         img, target = self.data[index], self.labels[index]
+        title = self.title[index]
+        #print(title)
         imgList = np.empty((3, 44, 44, 0), int)
         concat_axis = 3
 
@@ -57,13 +77,8 @@ class CUSTOM(data.Dataset):
                     imgFrame = self.transform(imgFrame)
                 image_np = np.array(imgFrame)
 
-                return image_np, target
+                return title, image_np, target
 
 
     def __len__(self):
-        if self.split == 'Training':
-            return len(self.train_data)
-        elif self.split == 'PublicTest':
-            return len(self.PublicTest_data)
-        else:
-            return len(self.PrivateTest_data)
+        return len(self.data)

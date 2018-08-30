@@ -13,6 +13,7 @@ import torch.nn.functional as F
 import os
 import argparse
 from fer import FER2013
+from qia import QIA
 
 from torch.autograd import Variable
 import torchvision
@@ -23,8 +24,8 @@ from models import *
 
 parser = argparse.ArgumentParser(description='PyTorch Fer2013 CNN Training')
 parser.add_argument('--model', type=str, default='VGG19', help='CNN architecture')
-parser.add_argument('--dataset', type=str, default='FER2013', help='CNN architecture')
-parser.add_argument('--split', type=str, default='PrivateTest', help='split')
+parser.add_argument('--dataset', type=str, default='QIA', help='CNN architecture')
+parser.add_argument('--split', type=str, default='PublicTest', help='split')
 opt = parser.parse_args()
 
 cut_size = 44
@@ -78,17 +79,18 @@ if opt.model == 'VGG19':
 elif opt.model  == 'Resnet18':
     net = ResNet18()
 
-path = os.path.join(opt.dataset + '_' + opt.model)
-checkpoint = torch.load(os.path.join(path, 'FER2013_' + opt.split + '_model.t7'))
+path = os.path.join('QIA' + '_' + opt.model)
+checkpoint = torch.load(os.path.join(path, opt.split + '_model.t7'))
 
 net.load_state_dict(checkpoint['net'])
 net.cuda()
 net.eval()
-Testset = FER2013(split = opt.split, transform=transform_test)
-Testloader = torch.utils.data.DataLoader(Testset, batch_size=128, shuffle=False, num_workers=1)
+Testset = QIA(split = opt.split, transform=transform_test)
+Testloader = torch.utils.data.DataLoader(Testset, batch_size=16, shuffle=False, num_workers=0)
 correct = 0
 total = 0
 all_target = []
+
 for batch_idx, (inputs, targets) in enumerate(Testloader):
 
     bs, ncrops, c, h, w = np.shape(inputs)
@@ -124,3 +126,4 @@ plot_confusion_matrix(matrix, classes=class_names, normalize=True,
                       title= opt.split+' Confusion Matrix (Accuracy: %0.3f%%)' %acc)
 plt.savefig(os.path.join(path, opt.split + '_cm.png'))
 plt.close()
+
