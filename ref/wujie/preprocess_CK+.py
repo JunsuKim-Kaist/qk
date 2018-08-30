@@ -29,6 +29,7 @@ if not os.path.exists(os.path.dirname(datapath)):
 # order the file, so the training set will not contain the test set (don't random)
 files = os.listdir(anger_path)
 files.sort()
+
 for filename in files:
     I = skimage.io.imread(os.path.join(anger_path,filename))
     data_x.append(I.tolist())

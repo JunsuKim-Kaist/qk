@@ -30,6 +30,7 @@ class VGG(nn.Module):
     def _make_layers(self, cfg):
         layers = []
         in_channels = 3
+
         for x in cfg:
             if x == 'M':
                 layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
@@ -39,4 +40,5 @@ class VGG(nn.Module):
                            nn.ReLU(inplace=True)]
                 in_channels = x
         layers += [nn.AvgPool2d(kernel_size=1, stride=1)]
+
         return nn.Sequential(*layers)
