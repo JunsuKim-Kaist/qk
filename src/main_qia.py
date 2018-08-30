@@ -71,7 +71,7 @@ elif opt.model  == 'Resnet18':
 
 if opt.pretrained:
     print('==> Use Pre-trained model using FER-2013')
-    pretrained_path = os.path.join('FER2013' + '_' + 'VGG19')
+    pretrained_path = os.path.join('FER2013' + '_' + opt.model)
     assert os.path.isdir(pretrained_path), 'Error: no checkpoint directory found!'
     checkpoint = torch.load(os.path.join(pretrained_path, 'FER2013_PublicTest_model.t7'))
 
