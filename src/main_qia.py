@@ -130,7 +130,9 @@ def train(epoch):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         optimizer.zero_grad()
-        inputs, targets = Variable(inputs), Variable(targets)
+        targets = Variable(targets)
+        with torch.no_grad():
+            inputs = Variable(inputs)
         inputs = inputs.float()
         #print(inputs.shape)
         outputs = net(inputs)
@@ -207,7 +209,9 @@ def PrivateTest(epoch):
         inputs = inputs.view(-1, c, h, w)
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
-        inputs, targets = Variable(inputs, volatile=True), Variable(targets)
+        targets =Variable(targets)
+        with torch.no_grad():
+            inputs = Variable(inputs)
         inputs = inputs.float()
         outputs = net(inputs)
         outputs_avg = outputs.view(bs, ncrops, -1).mean(1)  # avg over crops

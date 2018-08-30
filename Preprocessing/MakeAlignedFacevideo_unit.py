@@ -15,17 +15,15 @@ from os.path import isfile, join
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor and the face aligner
 detector = dlib.get_frontal_face_detector()
-weight = "mmod_human_face_detector.dat"
-cnn_detector = dlib.cnn_face_detection_model_v1(weight)
-predPath = os.path.join("/mnt/home/qualcomm/2junhan/qk/Preprocessing/shape_predictor_68_face_landmarks.dat")
+predPath = os.path.join("/mnt/home/qualcomm/junsu/qk/Preprocessing/shape_predictor_68_face_landmarks.dat")
 predictor = dlib.shape_predictor(predPath)
 fa = FaceAligner(predictor, desiredFaceWidth=256)
 
 
-ImageDir = "/mnt/home/qualcomm/Hackathon2018/QIA-Hackathon 2018/Emotion Recognition/Dataset/multimodal_video/"
-saveDir = "/mnt/home/qualcomm/data/alignedFaceVideo/"
+ImageDir = "/mnt/home/qualcomm/junsu/qk/Preprocessing/"
+saveDir = "/mnt/home/qualcomm/customdata/junsu/"
 imageIndex = 0
-imageFile = "013-213.mp4"
+imageFile = "IMG_6651.mp4"
 imageIndex += 1
 print("\n\n=========================================================")
 print("image : " + imageFile)
