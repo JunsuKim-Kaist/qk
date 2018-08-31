@@ -20,10 +20,10 @@ predictor = dlib.shape_predictor(predPath)
 fa = FaceAligner(predictor, desiredFaceWidth=256)
 
 
-ImageDir = "/mnt/home/qualcomm/junsu/qk/Preprocessing/"
-saveDir = "/mnt/home/qualcomm/customdata/junsu/"
+ImageDir = "/mnt/home/qualcomm/customdata/junsu/"
+saveDir = "/mnt/home/qualcomm/customdata/alignedFaceVideo/"
 imageIndex = 0
-imageFile = "IMG_6651.mp4"
+imageFile = "IMG_6734.mp4"
 imageIndex += 1
 print("\n\n=========================================================")
 print("image : " + imageFile)

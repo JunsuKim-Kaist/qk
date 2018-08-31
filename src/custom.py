@@ -18,30 +18,32 @@ class CUSTOM(data.Dataset):
     """
 
 
-    def __init__(self, split='Test', transform=None):
+    def __init__(self, split='Test', transform=None, h5file_path=None, Emofile_path=None):
+
         self.transform = transform
         self.split = split  # training set or test set
-        self.data = h5py.File('/mnt/home/qualcomm/customdata/customdata.h5', 'r', driver='core')
+        self.data = h5py.File(h5file_path, 'r', driver='core')
         # now load the picked numpy arrays
         #for key in self.data.keys():
         #    print(key)
         #    print(type(self.data[key][0]))
 
-        Emofile = '/mnt/home/qualcomm/customdata/customdata.xlsx'
+        Emofile = Emofile_path
         wb = openpyxl.load_workbook(Emofile)
         ws = wb.get_sheet_by_name('Sheet1')
+        datasetSize = ws.max_row
         #print(self.data['customTest_titleIndex'][0])
         self.title = []
-        for index in range(140):
-            rowIndex = self.data['customTest_titleIndex'][index]
+        for index in range(datasetSize):
+            rowIndex = self.data['FinalTest_titleIndex'][index]
             #print(rowIndex)
             #print(ws.cell(row= rowIndex, column=1).value)
             self.title.append(ws.cell(row= rowIndex, column=1).value)
-        self.labels = self.data['customTest_label']
-        self.data = self.data['customTest_pixel']
+        self.labels = self.data['FinalTest_label']
+        self.data = self.data['FinalTest_pixel']
 
         self.data = np.asarray(self.data)
-        self.data = self.data.reshape((140, 10, 48, 48, 3))
+        self.data = self.data.reshape((datasetSize, 1, 48, 48, 3))
 
         #print(self.title)
 
@@ -70,7 +72,7 @@ class CUSTOM(data.Dataset):
         #print(img.shape)
         #print(imgList.shape)
         for frame in range(img.shape[0]):
-            if frame == 5:
+            if frame == 0:
                 imgFrame = Image.fromarray(img[frame,:,:,:])
                 #print(imgFrame.size)
                 if self.transform is not None:
